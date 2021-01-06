@@ -3,7 +3,7 @@ import sinon from 'sinon'
 import 'mocha'
 
 import { Theme } from '../../../chat/commands/theme'
-import { OnCommandEvent } from '../../../models'
+import { OnCommandEvent, OnSayEvent } from '../../../models'
 import { EventBus, Events } from '../../../events'
 
 import { activeStream, onCommandExtra, user, viewerFlags } from '../../test-objects'
@@ -27,7 +27,7 @@ afterEach(() => {
 describe('Commands: Theme', () => {
 
   it('should send message to chat', () => {
-    var spy = sinon.spy()
+    const spy = sinon.spy()
 
     const emitter = EventBus.eventEmitter
     emitter.on(Events.OnSay, spy)
@@ -36,9 +36,20 @@ describe('Commands: Theme', () => {
 
     expect(spy.called).to.equal(true)
   })
+  it('should send message to chat with login', () => {
+    const spy = sinon.spy()
+    delete onCommandEvent.user.display_name;
+    onCommandEvent.user.login = "testLogin";
+    const emitter = EventBus.eventEmitter
+    emitter.on(Events.OnSay, spy)
 
+    Theme(onCommandEvent)
+
+    expect(spy.called).to.equal(true)
+    expect((spy.getCall(0).args[0] as OnSayEvent).message).to.contain(onCommandEvent.user.login);
+  })
   it('should not send events if theme is okay', () => {
-    var spy = sinon.spy()
+    const spy = sinon.spy()
 
     const emitter = EventBus.eventEmitter
     emitter.on(Events.OnSay, spy)
@@ -58,12 +69,12 @@ describe('Commands: Theme', () => {
 
 
   it('should not send events if user is dot_commie and theme is lasers', () => {
-    var spy = sinon.spy()
+    const spy = sinon.spy()
 
     const emitter = EventBus.eventEmitter
     emitter.on(Events.OnSay, spy)
 
-    let callingUser = user()
+    const callingUser = user()
     callingUser.login = 'dot_commie'
 
     onCommandEvent = new OnCommandEvent(

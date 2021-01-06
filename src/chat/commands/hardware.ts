@@ -6,7 +6,7 @@ import { ShouldThrottle } from '../shouldThrottle'
  * Sends a message to chat with specs for Michael's computer
  * @param onCommandEvent 
  */
-export function Hardware(onCommandEvent: OnCommandEvent) {
+export function Hardware(onCommandEvent: OnCommandEvent):void {
 
   const cooldownSeconds = 300
 
@@ -17,7 +17,7 @@ export function Hardware(onCommandEvent: OnCommandEvent) {
     return
   }
 
-  const message = `We done did the do`
+  const message = `The stream uses: Gb X570 AORUS Elite, AMD Ryzen 9 3950X, 64G RAM, GeForce RTX 2080 Super, 2x Sony A6400, Shure SM7B, GoXLR and a plethora of lights. `
 
   // Send the message to Twitch chat
   EventBus.eventEmitter.emit(Events.OnSay, new OnSayEvent(message))

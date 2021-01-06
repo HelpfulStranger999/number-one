@@ -1,10 +1,11 @@
-# Secrets
-.nexmo-app
-private.key
+package-lock.json
 
 # dotenv environment variables file
 .env
 .env.test
+
+# compiled css
+*.css
 
 # Logs
 logs

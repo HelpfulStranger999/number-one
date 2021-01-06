@@ -9,11 +9,13 @@ import qs from 'querystring'
 import { Config, TwitchTokenResponse } from './models'
 import { ChatMonitor } from './chat'
 import { webhookRouter } from './webhooks'
-import { overlayRouter } from './web'
+import { overlayRouter, assetsRouter } from './web'
 import { log, LogLevel } from './common'
 import { Fauna, Twitch } from './integrations'
 import { IO } from './hub'
+import { Logger } from './logger';
 import StreamElements from './integrations/streamelements'
+import { State } from './state'
 
 // Identify the Twitch credentials first
 const TWITCH_API = 'https://id.twitch.tv/oauth2/token'
@@ -49,17 +51,26 @@ async function init(response: AxiosResponse<TwitchTokenResponse>) {
   const app = express()
   const server = http.createServer(app)
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const streamElements = new StreamElements(config);
-  Twitch.init(config)
-  Fauna.init()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const io = new IO(server);
 
-  const io = new IO(server)
+  Fauna.init()
+  State.init()
+  Logger.init()
+  Twitch.init(config)
+
 
   app.use(express.json())
 
   app.use('/webhooks', webhookRouter)
 
   app.use('/overlays', overlayRouter)
+
+  if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
+    app.use('/overlays/assets', assetsRouter)
+  }
 
   server.listen(port, () => {
     log(LogLevel.Info, `Server is listening on port ${port}`)
